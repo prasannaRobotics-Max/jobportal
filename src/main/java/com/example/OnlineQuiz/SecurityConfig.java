@@ -46,6 +46,7 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.POST, "/users/auth").permitAll();
                     auth.requestMatchers(HttpMethod.POST,"/users/add").permitAll();
                     auth.requestMatchers(HttpMethod.POST,"/admin/add").permitAll();
+                     auth.requestMatchers("/swagger-ui").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session ->

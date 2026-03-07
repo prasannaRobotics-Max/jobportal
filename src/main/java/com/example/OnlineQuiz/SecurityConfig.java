@@ -49,8 +49,9 @@ public class SecurityConfig {
                     auth.requestMatchers(
                 "/v3/api-docs/**",
                 "/swagger-ui/**",
-                "/swagger-ui.html","/"
+                "/swagger-ui.html"
             ).permitAll();
+                     auth.requestMatchers(HttpMethod.GET,"/").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session ->

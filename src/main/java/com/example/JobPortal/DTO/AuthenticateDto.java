@@ -1,13 +1,15 @@
 package com.example.JobPortal.DTO;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
 public class AuthenticateDto {
-    @NotBlank
+    @NotBlank(message = "email is must")
+    @Email(message="give valid email")
    private String email;
-    @NotBlank
+    @NotBlank(message = "password must be given")
    private String password;
     private String role;
 

@@ -2,9 +2,7 @@ package com.example.JobPortal.DTO;
 
 import com.example.JobPortal.Utils.AppUtils;
 import jakarta.persistence.UniqueConstraint;
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,29 +12,31 @@ import java.util.List;
 @Data
 public class UserDto {
     private Long id;
-    @NotBlank
+    @NotBlank(message = "UserName cannot be empty")
     private String userName;
-    @NotBlank
+    @NotBlank(message = "email cannot be empty")
+    @Email(message = "Give me a valid Email")
     private String email;
-
-    @Digits(integer = 10, fraction = 0)
+    @NotNull(message = "contact Number cannot be null")
+    @Digits(integer = 10, fraction = 0,message = "give a valid 10 digits contact number")
     private Long contactNumber;
-    @NotNull
+    @NotNull(message = "role must be specified")
     private AppUtils.UserRoles role;
 
-    private String companyName;
+    private String companyName;//EMPLOYER
 
-    private String location;
-    @NotNull
+    private String location;//EMPLOYER
+    @NotBlank(message = "password cannot be blank")
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",message = "Password must be at least 8 characters long and contain letters, digits, and special characters")
     private String password;
 
-    private MultipartFile resume;
-    private MultipartFile profile;
+    private MultipartFile resume;// to receive inputs,JOBSEEKER
+    private MultipartFile profile;// to receive inputs,JOBSEEKER
 
-    private String resumeURL;
-    private String profileURL;
+    private String resumeURL;//to set in response
+    private String profileURL;// to set in response
 
-    private List<EducationDto> educations;
+    private List<EducationDto> educations;//JOBSEEKER
 
     public String getUserName() {
         return userName;

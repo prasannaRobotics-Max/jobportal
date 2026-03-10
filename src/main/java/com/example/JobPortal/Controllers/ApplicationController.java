@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
@@ -40,8 +41,7 @@ public class ApplicationController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable long id)
-    {
+    public void delete(@PathVariable long id)  {
        applicationService.DeleteApplication(id);
     }
 

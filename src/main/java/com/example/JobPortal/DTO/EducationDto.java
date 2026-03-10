@@ -5,13 +5,13 @@ import jakarta.validation.constraints.NotNull;
 
 public class EducationDto {
     private long id;
-    @NotBlank
+    @NotBlank(message = "levelOfStudy is must")
     private String levelOfStudy;
-    @NotNull
+    @NotNull(message = "totalMarks cannot be Null")
     private double totalMarks;
-    @NotBlank
+    @NotBlank(message = "name cannot be blank")
     private String name;
-    @NotBlank
+    @NotBlank(message = "yearOfCompletion cannot be blank and must")
     private String yearOfCompletion;
 
     public long getId() {

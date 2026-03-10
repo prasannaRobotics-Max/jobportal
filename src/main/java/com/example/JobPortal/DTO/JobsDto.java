@@ -9,25 +9,25 @@ import org.springframework.web.multipart.MultipartFile;
 public class JobsDto {
 
    private Long id;
-   @NotNull
+   @NotNull(message = "empId cannot be null")
    private Long empId;
-   @NotBlank
+   @NotBlank(message = "companyName cannot be blank")
    private String companyName;
 
    private MultipartFile companyLogo;
 
-   private String companyProfile;
-   @NotBlank
+   private String companyProfile;// used in response
+   @NotBlank(message = "jobRole cannot be blank")
    private String jobRole;
-   @NotBlank
+   @NotBlank(message = "description cannot be blank")
    private String description;
-   @NotNull
+   @NotNull(message = "salary cannot be null")
    private Long salary;
-   @NotBlank
+   @NotBlank(message = "category cannot be blank")
    private String category;
-   @NotBlank
+   @NotBlank(message = "location cannot be blank")
    private String location;
-   @NotBlank
+   @NotBlank(message = "deadline cannot be blank")
    private String deadLine;
 
    public Long getId() {

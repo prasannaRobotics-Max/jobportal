@@ -2,6 +2,7 @@ package com.example.JobPortal.Service;
 
 import com.example.JobPortal.DTO.JobsDto;
 import com.example.JobPortal.Entity.JobsEntity;
+import com.example.JobPortal.Exception.*;
 import com.example.JobPortal.Repository.JobRepository;
 import com.example.JobPortal.UpdateDto.JobsUpdateDto;
 import com.example.JobPortal.Utils.FIleUploadUtils;
@@ -56,7 +57,7 @@ public class JobsService implements JobsServiceInterface {
 
     @Override
     public JobsDto findJobDetails(long id) {
-        JobsEntity job=jobRepository.findById(id).orElseThrow(()->new RuntimeException("Job Not Found"));
+        JobsEntity job=jobRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("JOB ID",id,"FindJobDetails","JOB_NOT_FOUND_WITH_ID"));
         return modelMapper.map(job, JobsDto.class);
     }
 
@@ -69,13 +70,13 @@ public class JobsService implements JobsServiceInterface {
 
     @Override
     public void deleteJob(long id) {
-        JobsEntity jobId=jobRepository.findById(id).orElseThrow(()->new RuntimeException("Job ID not found"));
+        JobsEntity jobId=jobRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("JOB ID",id,"DeleteJobDetails","JOB_NOT_FOUND_WITH_ID"));
         jobRepository.delete(jobId);
     }
 
     @Override
     public JobsUpdateDto updateJob(long id, JobsUpdateDto dto) throws IOException {
-        JobsEntity jobsEntity=jobRepository.findById(id).orElseThrow(()->new RuntimeException("Invalid ID to update"));
+        JobsEntity jobsEntity=jobRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("JOB ID",id,"UpdateJobDetails","JOB_NOT_FOUND_WITH_ID"));
 
         if(dto.getEmpId()!=null) {
             jobsEntity.setEmpId(dto.getEmpId());
@@ -112,7 +113,7 @@ public class JobsService implements JobsServiceInterface {
 
     @Override
     public List<JobsDto> findMatchingOnes(String name) {
-        List<JobsEntity> matched=jobRepository.findByCompanyName(name).orElseThrow(()->new RuntimeException("Invalid Company"));
+        List<JobsEntity> matched=jobRepository.findByCompanyName(name).orElseThrow(()->new CompanyNotFoundException("CompanyName",name,"Find Matching company","COMPANY_NAME_NOT_FOUND"));
         List<JobsDto> filteredOne;
         if(matched.size()>0) {
             filteredOne = matched.stream().map((job) -> modelMapper.map(job, JobsDto.class)).toList();
@@ -126,7 +127,7 @@ public class JobsService implements JobsServiceInterface {
 
     @Override
     public List<JobsDto> findMatchingRoles(String role) {
-        List<JobsEntity> matched=jobRepository.findByJobRole(role).orElseThrow(()->new RuntimeException("Invalid Role"));
+        List<JobsEntity> matched=jobRepository.findByJobRole(role).orElseThrow(()->new JobRoleNotFoundException("JobRole",role,"matchingrole","JOB_ROLE_NOT_FOUND"));
         if(matched.size()>0) {
             List<JobsDto> filteredOne = matched.stream().map((job) -> modelMapper.map(job, JobsDto.class)).toList();
 
@@ -139,31 +140,25 @@ public class JobsService implements JobsServiceInterface {
 
     @Override
     public List<JobsDto> findMatchingLocations(String location) {
-        List<JobsEntity> matched=jobRepository.findByLocation(location).orElseThrow(()->new RuntimeException("Invalid Location"));
-        if(matched.size()>0) {
+        List<JobsEntity> matched=jobRepository.findByLocation(location).orElseThrow(()->new CompanyLocationNotFoundException("Company Location",location,"matching location","COMPANY_LOCATION_NOT_FOUND"));
             List<JobsDto> filtered = matched.stream().map((job) -> modelMapper.map(job, JobsDto.class)).toList();
             return filtered;
-        }
-        else{
-            throw new RuntimeException("The Location is not Found");
-        }
+
     }
 
     @Override
     public List<JobsDto> findMatchingSalary(Long salary) {
-        List<JobsEntity> matched=jobRepository.findBySalary(salary).orElseThrow(()->new RuntimeException("Invalid Salary"));
-        if(matched.size()>0) {
+        List<JobsEntity> matched=jobRepository.findBySalary(salary).orElseThrow(()->new SalaryNotFoundException("Salary",salary,"Matching Salary","SALARY_NOT_FOUND"));
+
             List<JobsDto> filtered = matched.stream().map((job) -> modelMapper.map(job, JobsDto.class)).toList();
             return filtered;
-        }
-        else{
-            throw new RuntimeException("The Salary Range is Not Available");
-        }
+
+
     }
 
     @Override
     public List<JobsDto> findMatchingJobs(String location, String role) {
-        List<JobsEntity> matched=jobRepository.findByJobRoleAndLocation(location,role).orElseThrow(()->new RuntimeException("Invalid Location and Role"));
+        List<JobsEntity> matched=jobRepository.findByJobRoleAndLocation(location,role).orElseThrow(()->new MatchingJobsNotFoundException("JobsMatched",location,role,"Matching Jobs","JOBS_NOT_FOUND"));
         if(matched.size()>0) {
             List<JobsDto> filtered = matched.stream().map((job) -> modelMapper.map(job, JobsDto.class)).toList();
             return filtered;
@@ -175,7 +170,7 @@ public class JobsService implements JobsServiceInterface {
 
     @Override
     public List<JobsDto> findRelJobs(long id) {
-        List<JobsEntity> jobs=jobRepository.findByEmpId(id).orElseThrow(()->new RuntimeException("The Employer is not found"));
+        List<JobsEntity> jobs=jobRepository.findByEmpId(id).orElseThrow(()->new ResourceNotFoundException("employer ID",id,"find employer jobs","JOBS_NOT_FOUND"));
         List<JobsDto> relJobs=jobs.stream().map((job->modelMapper.map(job, JobsDto.class))).collect(Collectors.toList());
         return relJobs;
     }

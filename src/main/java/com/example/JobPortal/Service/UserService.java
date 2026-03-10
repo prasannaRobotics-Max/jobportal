@@ -7,6 +7,8 @@ import com.example.JobPortal.DTO.EducationDto;
 import com.example.JobPortal.DTO.UserDto;
 import com.example.JobPortal.Entity.EducationEntity;
 import com.example.JobPortal.Entity.UserEntity;
+import com.example.JobPortal.Exception.EmailNotFoundException;
+import com.example.JobPortal.Exception.ResourceNotFoundException;
 import com.example.JobPortal.Repository.UserRepository;
 import com.example.JobPortal.UpdateDto.UserUpdateDto;
 import com.example.JobPortal.Utils.FIleUploadUtils;
@@ -85,7 +87,7 @@ public class UserService {
     }
 
     public void deleteUser(long id){
-        UserEntity user=userRepository.findById(id).orElseThrow(()->new RuntimeException("Not Found"));
+        UserEntity user=userRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("User ID",id,"DeleteUser","USER_NOT_FOUND_WITH_ID"));
         userRepository.delete(user);
     }
 
@@ -97,11 +99,11 @@ public class UserService {
     }
 
     public UserDto findUserDetails( long id){
-        UserEntity user=userRepository.findById(id).orElseThrow(()->new RuntimeException("Not Found"));
+        UserEntity user=userRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("User ID",id,"FindUserDetails","USER_NOT_FOUND_WITH_ID"));
         return modelMapper.map(user,UserDto.class);
     }
     public UserUpdateDto updateUser(long id, UserUpdateDto dto) throws IOException {
-       UserEntity userEntity=userRepository.findById(id).orElseThrow(()->new RuntimeException("Invalid ID to Update"));
+       UserEntity userEntity=userRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("User ID",id,"UpdateUserDetails","USER_NOT_FOUND_WITH_ID") );
        if(dto.getResume()!=null && !dto.getResume().isEmpty()) {
            String filePath=FIleUploadUtils.saveFiles("file/resume",dto.getResume());
            userEntity.setResumeURL(filePath);
@@ -146,7 +148,7 @@ public class UserService {
 
         UserEntity user = userRepository.findByEmail(
                 dto.getEmail()
-        ).orElseThrow(() -> new RuntimeException("User not found"));
+        ).orElseThrow(() -> new EmailNotFoundException("Email",dto.getEmail(),"UserService","USER_NOT_FOUND_WITH_GIVEN_EMAIL"));
 
 
         String token = jwtUtil.generateToken(user.getEmail());

@@ -11,14 +11,14 @@ import org.springframework.web.multipart.MultipartFile;
 public class ApplicationDto {
     private Long id;
 
-    @NotNull
+    @NotNull(message = "Jobseeker ID is must for applying")
      private Long jobSeekerId;
 
-     private String resume;
-     private AppUtils.status status;
-    @NotNull
+     private String resume;// internally fetched
+     private AppUtils.status status;//internally set
+    @NotNull(message = "Job Id is must for application")
     private Long jobId;
-    @NotNull
+    @NotNull(message = "empId is must")
     private Long empId;
 
     public Long getEmpId() {

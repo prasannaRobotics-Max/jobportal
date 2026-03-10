@@ -6,6 +6,7 @@ import com.example.JobPortal.DTO.UserDto;
 import com.example.JobPortal.Entity.ApplicationEntity;
 import com.example.JobPortal.Entity.JobsEntity;
 import com.example.JobPortal.Entity.UserEntity;
+import com.example.JobPortal.Exception.ResourceNotFoundException;
 import com.example.JobPortal.Repository.ApplicationRepository;
 import com.example.JobPortal.Repository.JobRepository;
 import com.example.JobPortal.UpdateDto.ApplicationUpdateDto;
@@ -48,7 +49,7 @@ public class ApplicationService implements  ApplicationServiceInterface{
         applicationEntity.setJobSeekerId(dto.getJobSeekerId());
         applicationEntity.setResume(jobSeeker.getResumeURL());
         JobsEntity job = jobRepository.findById(dto.getJobId())
-                .orElseThrow(() -> new RuntimeException("Job not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Job ID",dto.getJobId(),"AddApplication","JOB_NOT_FOUND"));
         applicationEntity.setJobId(job);
         ApplicationEntity saved=applicationRepository.save(applicationEntity);
         return modelMapper.map(saved,ApplicationDto.class);
@@ -56,7 +57,7 @@ public class ApplicationService implements  ApplicationServiceInterface{
 
     @Override
     public ApplicationUpdateDto update(long id, ApplicationUpdateDto dto) {
-        ApplicationEntity user=applicationRepository.findById(id).orElseThrow(()->new RuntimeException("INVALID APPLICATION ID"));
+        ApplicationEntity user=applicationRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Application ID",id,"Updating Application","APPLICATION_NOT_FOUND"));
         UserDto employer=userService.findUserDetails(user.getEmpId());
         if (employer.getRole() == AppUtils.UserRoles.EMPLOYER) {
             if (dto.getStatus() == AppUtils.status.APPROVED) {
@@ -94,13 +95,13 @@ public class ApplicationService implements  ApplicationServiceInterface{
 
     @Override
     public ApplicationDto findApplicationId(long id) {
-        ApplicationEntity applicant=applicationRepository.findById(id).orElseThrow(()->new RuntimeException("Applicant Not Found"));
+        ApplicationEntity applicant=applicationRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Application ID",id,"findApplication","APPLICATION_NOT_FOUND"));
         return modelMapper.map(applicant,ApplicationDto.class);
     }
 
     @Override
     public void DeleteApplication(long id) {
-        ApplicationEntity applicant=applicationRepository.findById(id).orElseThrow(()->new RuntimeException("Applicant Not Found"));
+        ApplicationEntity applicant=applicationRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Application ID",id,"Delete Application","APPLICATION_NOT_FOUND"));
         UserDto employer=userService.findUserDetails(applicant.getEmpId());
         if(employer.getRole()== AppUtils.UserRoles.JOBSEEKER)
         {
@@ -116,13 +117,13 @@ public class ApplicationService implements  ApplicationServiceInterface{
         UserDto role=userService.findUserDetails(id);
         if(role==null)
         {
-            throw new RuntimeException("Invalid user");
+            throw new ResourceNotFoundException("Jobseeker",id,"Finding JobSeeker Application","USER_NOT_FOUND");
         }
         List<ApplicationEntity> filtered=applicationRepository.findByJobSeekerId(id);
         return filtered.stream().map(app -> {
             long jobId=app.getJobId().getId();
             JobsEntity job = jobRepository.findById(jobId)
-                    .orElseThrow(() -> new RuntimeException("Job not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Job ID",jobId,"Finding JobSeeker Applications","JOB_NOT_FOUND"));
 
             ApplicationResponseDto dto = new ApplicationResponseDto();
             dto.setCompanyName(job.getCompanyName());
@@ -140,7 +141,7 @@ public class ApplicationService implements  ApplicationServiceInterface{
        UserDto role=userService.findUserDetails(id);
         if(role==null)
         {
-            throw new RuntimeException("Invalid User");
+            throw new ResourceNotFoundException("Employer",id,"employerApplication","EMPLOYER_NOT_FOUND");
         }
         List<ApplicationEntity> filtered=applicationRepository.findByEmpId(id);
         return filtered.stream().map(app->{
